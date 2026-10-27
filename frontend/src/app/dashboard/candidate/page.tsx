@@ -2,6 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { signout } from "@/app/auth/actions";
+import { AppHeader } from "@/components/layout/app-header";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -22,98 +26,80 @@ export default async function CandidateDashboardPage() {
     .eq("id", user.id)
     .single();
 
+  const visibilityLabel =
+    profile?.visibility === "public"
+      ? "Public"
+      : profile?.visibility === "private"
+        ? "Private"
+        : "Employers only";
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Top Navigation */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white text-sm">
-            Z
-          </div>
-          <span className="font-semibold tracking-tight text-white">Zigba AI Network</span>
-          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-950 border border-emerald-700 text-emerald-300">
-            Candidate
-          </span>
-        </div>
+    <div className="shell">
+      <AppHeader role="Candidate" email={user.email}>
+        <Link href="/dashboard/candidate/profile" className="btn btn--ghost">
+          My profile
+        </Link>
+        <form action={signout}>
+          <button type="submit" className="btn btn--secondary">
+            Sign out
+          </button>
+        </form>
+      </AppHeader>
 
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/dashboard/candidate/profile"
-            className="text-xs text-slate-300 hover:text-white transition-colors"
-          >
-            My Profile
-          </Link>
-          <span className="text-xs text-slate-400 hidden sm:inline">{user.email}</span>
-          <form action={signout}>
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg transition-colors cursor-pointer border border-slate-700"
-            >
-              Sign Out
-            </button>
-          </form>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="max-w-5xl mx-auto p-6 mt-6">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <main className="page page--app">
+        <div className="welcome">
           <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold text-white">
-                Welcome, {profile?.full_name || "Candidate"}!
-              </h1>
-              <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                {profile?.visibility || "Employers Only"}
-              </span>
+            <div className="chip-row" style={{ marginBottom: "0.65rem" }}>
+              <Badge tone="muted">{visibilityLabel}</Badge>
             </div>
-            <p className="text-sm text-slate-400 mt-1">
+            <h1 className="display" style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}>
+              Welcome, {profile?.full_name || "Candidate"}
+            </h1>
+            <p className="lede">
               {profile?.headline || "Your evidence-based candidate profile is ready."}
             </p>
             {profile?.location && (
-              <p className="text-xs text-slate-500 mt-0.5">📍 {profile.location}</p>
+              <p className="lede" style={{ marginTop: "0.35rem", fontSize: "0.9rem" }}>
+                {profile.location}
+              </p>
             )}
           </div>
-
-          <Link
-            href="/dashboard/candidate/profile"
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition-colors shadow-md shadow-emerald-950 cursor-pointer"
-          >
-            Edit Profile, Skills & Studies
+          <Link href="/dashboard/candidate/profile" className="btn btn--primary">
+            Edit profile, skills &amp; studies
           </Link>
         </div>
 
-        {/* Feature Placeholders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
-            <h2 className="font-semibold text-white text-base">My Evidence Items</h2>
-            <p className="text-xs text-slate-400 mt-1 mb-4">
-              Add verified proof of code, projects, and skills.
-            </p>
-            <div className="h-24 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-xs text-slate-500">
-              No evidence submitted yet
-            </div>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
-            <h2 className="font-semibold text-white text-base">My Applications</h2>
-            <p className="text-xs text-slate-400 mt-1 mb-4">
-              Track the status of your applications.
-            </p>
-            <div className="h-24 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-xs text-slate-500">
-              No active applications
-            </div>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
-            <h2 className="font-semibold text-white text-base">Verified Badges</h2>
-            <p className="text-xs text-slate-400 mt-1 mb-4">
-              Independently reviewed competence proofs.
-            </p>
-            <div className="h-24 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-xs text-slate-500">
-              Level: Self-Reported
-            </div>
-          </div>
+        <div className="grid-3">
+          <Card>
+            <CardHeader
+              title="Evidence items"
+              description="Add verified proof of code, projects, and skills."
+            />
+            <EmptyState
+              title="No evidence submitted yet"
+              body="A public repository, live demo, or report can sit beside a claim."
+            />
+          </Card>
+          <Card>
+            <CardHeader
+              title="Applications"
+              description="Track the status of your applications."
+            />
+            <EmptyState
+              title="No active applications"
+              body="When you apply, the job and your attached proof will appear here."
+            />
+          </Card>
+          <Card>
+            <CardHeader
+              title="Evidence status"
+              description="Independently reviewed competence proofs."
+            />
+            <EmptyState
+              title="Level: self-reported"
+              body="Claims start here. Review and confirmation come later, with precise wording."
+            />
+          </Card>
         </div>
       </main>
     </div>

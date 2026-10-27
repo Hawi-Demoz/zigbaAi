@@ -10,6 +10,11 @@ import {
   addSkillAction,
   deleteSkillAction,
 } from "../actions";
+import { AppHeader } from "@/components/layout/app-header";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Field, TextArea, TextInput } from "@/components/ui/field";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -24,202 +29,164 @@ export default async function CandidateProfilePage() {
     redirect("/login");
   }
 
-  // 1. Fetch Profile
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, full_name, headline, bio, location, visibility")
     .eq("id", user.id)
     .single();
 
-  // 2. Fetch Education
   const { data: education } = await supabase
     .from("education")
     .select("id, institution, degree, field_of_study, start_date, end_date, is_current, verification_status")
     .eq("profile_id", user.id)
     .order("created_at", { ascending: false });
 
-  // 3. Fetch Experience
   const { data: experience } = await supabase
     .from("experience")
     .select("id, company_name, role_title, description, start_date, end_date, is_current")
     .eq("profile_id", user.id)
     .order("created_at", { ascending: false });
 
-  // 4. Fetch Skills
   const { data: profileSkills } = await supabase
     .from("profile_skills")
     .select("id, years_experience, skills(id, name, category)")
     .eq("profile_id", user.id);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
-      {/* Top Header */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/dashboard/candidate"
-            className="text-xs text-slate-400 hover:text-white transition-colors"
-          >
-            ← Back to Dashboard
-          </Link>
-          <span className="text-slate-600">|</span>
-          <span className="font-semibold text-sm text-white">Candidate Profile & Evidence Setup</span>
-        </div>
-        <span className="text-xs text-slate-400">{user.email}</span>
-      </header>
+    <div className="shell">
+      <AppHeader email={user.email}>
+        <Link href="/dashboard/candidate" className="btn btn--ghost">
+          Back to dashboard
+        </Link>
+      </AppHeader>
 
-      <main className="max-w-4xl mx-auto p-6 mt-4 space-y-8">
-        {/* Page Title */}
+      <main className="page page--app stack">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Edit Candidate Profile</h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="display" style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}>
+            Edit candidate profile
+          </h1>
+          <p className="lede">
             Customize how employers and peers see your evidence of competence.
           </p>
         </div>
 
-        {/* 1. BASIC INFORMATION & PRIVACY SETTINGS */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-white mb-4">Profile Details & Privacy</h2>
-          <form action={updateCandidateProfile} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Full Name
-                </label>
-                <input
+        <Card>
+          <CardHeader
+            title="Profile details & privacy"
+            description="A headline and bio help employers read your work in context."
+          />
+          <form action={updateCandidateProfile} className="stack">
+            <div className="form-grid form-grid--2">
+              <Field label="Full name">
+                <TextInput
                   name="full_name"
                   type="text"
                   required
                   defaultValue={profile?.full_name || ""}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Location
-                </label>
-                <input
+              </Field>
+              <Field label="Location">
+                <TextInput
                   name="location"
                   type="text"
-                  placeholder="e.g. Remote / New York, NY"
+                  placeholder="e.g. Addis Ababa / Remote"
                   defaultValue={profile?.location || ""}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
-              </div>
+              </Field>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Headline
-              </label>
-              <input
+            <Field label="Headline">
+              <TextInput
                 name="headline"
                 type="text"
-                placeholder="e.g. Full-Stack Developer | Python & React"
+                placeholder="e.g. Full-stack developer · Python & React"
                 defaultValue={profile?.headline || ""}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
+            </Field>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Bio / Summary
-              </label>
-              <textarea
+            <Field label="Bio / summary">
+              <TextArea
                 name="bio"
                 rows={3}
-                placeholder="Briefly describe your focus, interests, and proof of work..."
+                placeholder="Briefly describe your focus, interests, and proof of work…"
                 defaultValue={profile?.bio || ""}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
+            </Field>
 
-            {/* Privacy Setting: public / employers only / private */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Privacy Setting
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <label className="flex items-start space-x-3 p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700">
+            <Field label="Privacy setting">
+              <div className="privacy">
+                <label>
                   <input
                     type="radio"
                     name="visibility"
                     value="public"
                     defaultChecked={profile?.visibility === "public"}
-                    className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
                   />
                   <div>
-                    <span className="block text-xs font-semibold text-white">Public</span>
-                    <span className="block text-[11px] text-slate-400">Viewable by all members</span>
+                    <strong>Public</strong>
+                    <span>Viewable by all members</span>
                   </div>
                 </label>
-
-                <label className="flex items-start space-x-3 p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700">
+                <label>
                   <input
                     type="radio"
                     name="visibility"
                     value="employers_only"
                     defaultChecked={profile?.visibility === "employers_only" || !profile?.visibility}
-                    className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
                   />
                   <div>
-                    <span className="block text-xs font-semibold text-white">Employers Only</span>
-                    <span className="block text-[11px] text-slate-400">Verified hiring managers only</span>
+                    <strong>Employers only</strong>
+                    <span>Verified hiring managers only</span>
                   </div>
                 </label>
-
-                <label className="flex items-start space-x-3 p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700">
+                <label>
                   <input
                     type="radio"
                     name="visibility"
                     value="private"
                     defaultChecked={profile?.visibility === "private"}
-                    className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
                   />
                   <div>
-                    <span className="block text-xs font-semibold text-white">Private</span>
-                    <span className="block text-[11px] text-slate-400">Only visible to you</span>
+                    <strong>Private</strong>
+                    <span>Only visible to you</span>
                   </div>
                 </label>
               </div>
-            </div>
+            </Field>
 
-            <button
-              type="submit"
-              className="py-2 px-5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-xs transition-colors cursor-pointer"
-            >
-              Save Profile Changes
-            </button>
-          </form>
-        </div>
-
-        {/* 2. SKILLS SECTION */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-semibold text-white">Skills Catalog</h2>
-              <p className="text-xs text-slate-400">Technologies and competencies you work with.</p>
+              <button type="submit" className="btn btn--primary">
+                Save profile changes
+              </button>
             </div>
-          </div>
+          </form>
+        </Card>
 
-          {/* List Skills */}
-          <div className="flex flex-wrap gap-2 mb-6">
+        <Card>
+          <CardHeader
+            title="Skills catalog"
+            description="Technologies and competencies you work with."
+          />
+
+          <div className="chip-row">
             {profileSkills && profileSkills.length > 0 ? (
               profileSkills.map((ps: any) => (
-                <div
-                  key={ps.id}
-                  className="inline-flex items-center space-x-2 px-3 py-1 bg-slate-950 border border-slate-700 rounded-full text-xs text-slate-200"
-                >
-                  <span className="font-medium">{ps.skills?.name}</span>
-                  {ps.years_experience && (
-                    <span className="text-[10px] text-slate-400">({ps.years_experience} yrs)</span>
-                  )}
+                <div key={ps.id} className="chip">
+                  <span>
+                    {ps.skills?.name}
+                    {ps.years_experience ? (
+                      <span style={{ color: "var(--ink-muted)" }}>
+                        {" "}
+                        · {ps.years_experience} yrs
+                      </span>
+                    ) : null}
+                  </span>
                   <form action={deleteSkillAction.bind(null, ps.id)}>
                     <button
                       type="submit"
-                      className="text-slate-400 hover:text-rose-400 ml-1 text-sm font-bold cursor-pointer"
+                      className="btn btn--danger"
                       title="Remove skill"
+                      aria-label={`Remove ${ps.skills?.name || "skill"}`}
                     >
                       ×
                     </button>
@@ -227,239 +194,196 @@ export default async function CandidateProfilePage() {
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-500 italic">No skills listed yet.</p>
+              <EmptyState
+                title="No skills listed yet"
+                body="Add a skill you can later attach to a project or proof item."
+              />
             )}
           </div>
 
-          {/* Add Skill Form */}
-          <form action={addSkillAction} className="bg-slate-950/60 p-4 border border-slate-800/80 rounded-lg">
-            <span className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Add New Skill
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input
+          <form action={addSkillAction} className="inset">
+            <p className="field__label" style={{ marginBottom: "0.75rem" }}>
+              Add new skill
+            </p>
+            <div className="form-grid form-grid--3">
+              <TextInput
                 name="skill_name"
                 type="text"
                 required
                 placeholder="Skill (e.g. Python, React)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-              <input
+              <TextInput
                 name="category"
                 type="text"
-                placeholder="Category (e.g. Backend, Database)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Category (e.g. Backend)"
               />
-              <div className="flex space-x-2">
-                <input
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <TextInput
                   name="years_experience"
                   type="number"
                   step="0.5"
                   min="0"
                   placeholder="Years"
-                  className="w-24 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  style={{ width: "5.5rem" }}
                 />
-                <button
-                  type="submit"
-                  className="flex-1 py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-xs transition-colors cursor-pointer"
-                >
-                  Add Skill
+                <button type="submit" className="btn btn--primary">
+                  Add skill
                 </button>
               </div>
             </div>
           </form>
-        </div>
+        </Card>
 
-        {/* 3. EDUCATION SECTION (OPTIONAL - PERSONAL EMAIL MARKED SELF-REPORTED) */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
-          <div className="mb-4">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-base font-semibold text-white">Education & Self-Taught Studies</h2>
-              <span className="px-2 py-0.5 text-[10px] bg-slate-800 text-slate-400 rounded-full font-medium">
-                Optional
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Beginners without formal degrees can skip this section. Education added via personal emails is marked as <strong>Self-Reported</strong>.
-            </p>
-          </div>
+        <Card>
+          <CardHeader
+            title="Education & self-taught studies"
+            description={
+              <>
+                Optional. Beginners without formal degrees can skip this. Education
+                added via personal emails is marked <strong>self-reported</strong>.
+              </>
+            }
+            action={<Badge tone="muted">Optional</Badge>}
+          />
 
-          {/* Education List */}
-          <div className="space-y-3 mb-6">
+          <div>
             {education && education.length > 0 ? (
               education.map((edu: any) => (
-                <div
-                  key={edu.id}
-                  className="p-4 bg-slate-950 border border-slate-800 rounded-lg flex items-start justify-between"
-                >
+                <div key={edu.id} className="record">
                   <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-sm text-white">{edu.institution}</span>
-                      <span
-                        className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
-                          edu.verification_status === "self_reported"
-                            ? "bg-amber-950/60 border-amber-800 text-amber-300"
-                            : "bg-emerald-950/60 border-emerald-800 text-emerald-300"
-                        }`}
-                      >
-                        {edu.verification_status === "self_reported" ? "Self-Reported" : "Institutional Submitted"}
-                      </span>
+                    <div className="chip-row" style={{ marginBottom: "0.35rem" }}>
+                      <h3>{edu.institution}</h3>
+                      <Badge tone={edu.verification_status === "self_reported" ? "warn" : "ok"}>
+                        {edu.verification_status === "self_reported"
+                          ? "Self-reported"
+                          : "Institutional submitted"}
+                      </Badge>
                     </div>
                     {(edu.degree || edu.field_of_study) && (
-                      <p className="text-xs text-slate-300 mt-0.5">
-                        {edu.degree} {edu.field_of_study && `• ${edu.field_of_study}`}
+                      <p>
+                        {edu.degree} {edu.field_of_study && `· ${edu.field_of_study}`}
                       </p>
                     )}
                     {(edu.start_date || edu.end_date) && (
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p>
                         {edu.start_date || "N/A"} — {edu.is_current ? "Present" : edu.end_date || "N/A"}
                       </p>
                     )}
                   </div>
                   <form action={deleteEducationAction.bind(null, edu.id)}>
-                    <button
-                      type="submit"
-                      className="text-xs text-rose-400 hover:underline cursor-pointer"
-                    >
+                    <button type="submit" className="btn btn--danger">
                       Delete
                     </button>
                   </form>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-500 italic">No education entries added (completely optional).</p>
+              <EmptyState
+                title="No education entries"
+                body="Add a university, bootcamp, or self-taught path — or leave this blank."
+              />
             )}
           </div>
 
-          {/* Add Education Form */}
-          <form action={addEducationAction} className="bg-slate-950/60 p-4 border border-slate-800/80 rounded-lg space-y-3">
-            <span className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-              Add Education or Study Platform
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
+          <form action={addEducationAction} className="inset stack">
+            <p className="field__label">Add education or study platform</p>
+            <div className="form-grid form-grid--2">
+              <TextInput
                 name="institution"
                 type="text"
                 required
-                placeholder="Institution (e.g. FreeCodeCamp, University)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Institution (e.g. FreeCodeCamp, university)"
               />
-              <input
+              <TextInput
                 name="degree"
                 type="text"
-                placeholder="Degree or Certificate (e.g. Full-Stack Cert)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Degree or certificate"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
+            <div className="form-grid form-grid--2">
+              <TextInput
                 name="field_of_study"
                 type="text"
-                placeholder="Field of study (e.g. Web Development)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Field of study"
               />
-              <div>
-                <input
+              <Field
+                label="Contact / alumni email"
+                hint={'Personal emails (gmail/yahoo) are marked "Self-Reported".'}
+              >
+                <TextInput
                   name="contact_email"
                   type="email"
-                  placeholder="Contact/Alumni email (e.g. @university.edu or @gmail.com)"
-                  className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  placeholder="you@university.edu"
                 />
-                <span className="block text-[10px] text-slate-500 mt-0.5">
-                  Personal emails (gmail/yahoo) are marked &quot;Self-Reported&quot;.
-                </span>
-              </div>
+              </Field>
             </div>
-            <button
-              type="submit"
-              className="py-1.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-xs transition-colors cursor-pointer"
-            >
-              Add Education
-            </button>
+            <div>
+              <button type="submit" className="btn btn--primary">
+                Add education
+              </button>
+            </div>
           </form>
-        </div>
+        </Card>
 
-        {/* 4. EXPERIENCE SECTION (OPTIONAL FOR BEGINNERS) */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
-          <div className="mb-4">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-base font-semibold text-white">Experience & Work History</h2>
-              <span className="px-2 py-0.5 text-[10px] bg-slate-800 text-slate-400 rounded-full font-medium">
-                Optional
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              No prior corporate work history required. Beginners can leave this blank.
-            </p>
-          </div>
+        <Card>
+          <CardHeader
+            title="Experience & work history"
+            description="Optional. No prior corporate work history required. Beginners can leave this blank."
+            action={<Badge tone="muted">Optional</Badge>}
+          />
 
-          {/* Experience List */}
-          <div className="space-y-3 mb-6">
+          <div>
             {experience && experience.length > 0 ? (
               experience.map((exp: any) => (
-                <div
-                  key={exp.id}
-                  className="p-4 bg-slate-950 border border-slate-800 rounded-lg flex items-start justify-between"
-                >
+                <div key={exp.id} className="record">
                   <div>
-                    <span className="font-semibold text-sm text-white">{exp.role_title}</span>
-                    <p className="text-xs text-slate-300 mt-0.5">{exp.company_name}</p>
-                    {exp.description && (
-                      <p className="text-xs text-slate-400 mt-1">{exp.description}</p>
-                    )}
+                    <h3>{exp.role_title}</h3>
+                    <p>{exp.company_name}</p>
+                    {exp.description && <p>{exp.description}</p>}
                   </div>
                   <form action={deleteExperienceAction.bind(null, exp.id)}>
-                    <button
-                      type="submit"
-                      className="text-xs text-rose-400 hover:underline cursor-pointer"
-                    >
+                    <button type="submit" className="btn btn--danger">
                       Delete
                     </button>
                   </form>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-500 italic">No work history listed (completely optional).</p>
+              <EmptyState
+                title="No work history listed"
+                body="Freelance, internships, and campus projects can live here later."
+              />
             )}
           </div>
 
-          {/* Add Experience Form */}
-          <form action={addExperienceAction} className="bg-slate-950/60 p-4 border border-slate-800/80 rounded-lg space-y-3">
-            <span className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-              Add Experience Item
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
+          <form action={addExperienceAction} className="inset stack">
+            <p className="field__label">Add experience item</p>
+            <div className="form-grid form-grid--2">
+              <TextInput
                 name="company_name"
                 type="text"
                 required
-                placeholder="Company or Client Name"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Company or client name"
               />
-              <input
+              <TextInput
                 name="role_title"
                 type="text"
                 required
-                placeholder="Role Title (e.g. Freelance Web Developer)"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Role title"
               />
             </div>
+            <TextArea
+              name="description"
+              rows={2}
+              placeholder="Brief summary of duties and technologies used…"
+            />
             <div>
-              <textarea
-                name="description"
-                rows={2}
-                placeholder="Brief summary of duties and technologies used..."
-                className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
+              <button type="submit" className="btn btn--primary">
+                Add experience
+              </button>
             </div>
-            <button
-              type="submit"
-              className="py-1.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-xs transition-colors cursor-pointer"
-            >
-              Add Experience
-            </button>
           </form>
-        </div>
+        </Card>
       </main>
     </div>
   );

@@ -4,6 +4,10 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { login } from "@/app/auth/actions";
+import { SiteHeader } from "@/components/layout/site-header";
+import { Alert } from "@/components/ui/alert";
+import { Field, TextInput } from "@/components/ui/field";
+import { SkeletonPage } from "@/components/ui/skeleton";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -28,78 +32,64 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl p-8 shadow-2xl">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Welcome Back</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Sign in to access your evidence-based professional dashboard
-        </p>
+    <div className="auth__card">
+      <div className="auth__intro">
+        <h1>Welcome back</h1>
+        <p>Sign in to your evidence-based professional dashboard.</p>
       </div>
 
-      {initialMessage && (
-        <div className="mb-4 p-3 bg-blue-950/60 border border-blue-800 text-blue-200 text-sm rounded-lg">
-          {initialMessage}
-        </div>
-      )}
+      {initialMessage && <Alert tone="info">{initialMessage}</Alert>}
+      {error && <Alert tone="error">{error}</Alert>}
 
-      {error && (
-        <div className="mb-4 p-3 bg-rose-950/60 border border-rose-800 text-rose-200 text-sm rounded-lg">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-            Email Address
-          </label>
-          <input
+      <form onSubmit={handleSubmit} className="auth__form" style={{ marginTop: "1rem" }}>
+        <Field label="Email address">
+          <TextInput
             name="email"
             type="email"
             required
+            autoComplete="email"
             placeholder="you@example.com"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
           />
-        </div>
+        </Field>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-            Password
-          </label>
-          <input
+        <Field label="Password">
+          <TextInput
             name="password"
             type="password"
             required
-            placeholder="••••••••"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+            autoComplete="current-password"
+            placeholder="Your password"
           />
-        </div>
+        </Field>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-2"
-        >
-          {loading ? "Signing in..." : "Sign In"}
+        <button type="submit" disabled={loading} className="btn btn--primary btn--block">
+          {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
-      <div className="mt-6 text-center text-xs text-slate-400">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-emerald-400 hover:underline font-semibold">
-          Create an account
-        </Link>
-      </div>
+      <p className="auth__foot">
+        Don&apos;t have an account? <Link href="/signup">Create an account</Link>
+      </p>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
-      <Suspense fallback={<div className="text-slate-400 text-sm">Loading...</div>}>
-        <LoginForm />
-      </Suspense>
+    <div className="shell">
+      <SiteHeader
+        compact
+        trailing={
+          <Link href="/signup" className="btn btn--ghost">
+            Create account
+          </Link>
+        }
+      />
+      <main className="auth">
+        <Suspense fallback={<SkeletonPage label="Loading sign in" />}>
+          <LoginForm />
+        </Suspense>
+      </main>
     </div>
   );
 }

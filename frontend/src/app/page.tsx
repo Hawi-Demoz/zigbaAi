@@ -1,64 +1,118 @@
 import Link from "next/link";
+import { SiteHeader } from "@/components/layout/site-header";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between">
-      {/* Navigation */}
-      <header className="border-b border-slate-800/80 px-8 py-5 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="h-9 w-9 rounded-xl bg-emerald-600 flex items-center justify-center font-bold text-white text-base shadow-lg shadow-emerald-950">
-            Z
-          </div>
-          <span className="font-bold tracking-tight text-lg text-white">Zigba AI Network</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/signup"
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-md shadow-emerald-950/50"
-          >
-            Create Account
-          </Link>
-        </div>
-      </header>
+    <div className="shell">
+      <SiteHeader
+        trailing={
+          <>
+            <Link href="/login" className="btn btn--ghost">
+              Sign in
+            </Link>
+            <Link href="/signup" className="btn btn--primary">
+              Create account
+            </Link>
+          </>
+        }
+      />
 
-      {/* Hero */}
-      <main className="max-w-4xl mx-auto px-6 py-20 text-center flex flex-col items-center">
-        <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-800 text-emerald-300 mb-6">
-          Evidence Over Claims • Real Proof of Competence
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-2xl">
-          The Professional Network Built on Verified Proof.
-        </h1>
-        <p className="text-base sm:text-lg text-slate-400 mt-4 max-w-xl">
-          Connect candidates and employers with verifiable code, project artifacts, and independent checks. Beginners without work history can fully participate.
-        </p>
+      <main className="shell__main">
+        <div className="page">
+          <section className="hero">
+            <div>
+              <p className="hero__kicker">Evidence over claims</p>
+              <h1 className="display">Show the work. Keep the proof.</h1>
+              <p className="lede">
+                Zigba is a professional network for students and graduates who
+                can demonstrate skill through projects — and for employers who
+                are checked before they post a job.
+              </p>
+              <div className="hero__actions">
+                <Link href="/signup" className="btn btn--primary">
+                  Join as candidate or employer
+                </Link>
+                <Link href="/dashboard" className="btn btn--secondary">
+                  Go to dashboard
+                </Link>
+              </div>
+            </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <Link
-            href="/signup"
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-sm transition-colors shadow-lg shadow-emerald-950"
-          >
-            Join as Candidate or Employer
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-6 py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-medium rounded-lg text-sm transition-colors"
-          >
-            Go to Dashboard
-          </Link>
+            <ol className="ledger" aria-label="Evidence states">
+              <li className="ledger__row">
+                <span className="ledger__index">01</span>
+                <div>
+                  <p className="ledger__label">Self-reported</p>
+                  <p className="ledger__note">You declared the skill. Nothing has been reviewed yet.</p>
+                </div>
+              </li>
+              <li className="ledger__row">
+                <span className="ledger__index">02</span>
+                <div>
+                  <p className="ledger__label">Evidence submitted</p>
+                  <p className="ledger__note">A repository, demo, report, or file is attached.</p>
+                </div>
+              </li>
+              <li className="ledger__row">
+                <span className="ledger__index">03</span>
+                <div>
+                  <p className="ledger__label">Evidence reviewed</p>
+                  <p className="ledger__note">The record states exactly what was examined, and what was not.</p>
+                </div>
+              </li>
+              <li className="ledger__row">
+                <span className="ledger__index">04</span>
+                <div>
+                  <p className="ledger__label">Independently confirmed</p>
+                  <p className="ledger__note">An issuer, collaborator, or assessment supports a specific claim.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section className="section">
+            <h2>Built for first proof, not first title</h2>
+            <ul className="facts">
+              <li>
+                <strong>Beginners belong here</strong>
+                <span>No job history required. Projects, coursework, and self-taught work count.</span>
+              </li>
+              <li>
+                <strong>Precise language</strong>
+                <span>A badge never means “expert.” It says what was checked, on which date, and the limit of that check.</span>
+              </li>
+              <li>
+                <strong>Employers earn reach</strong>
+                <span>Company checks come before unlimited listings. Candidates are never charged a fee to apply.</span>
+              </li>
+            </ul>
+          </section>
+
+          <section className="section">
+            <h2>Two doors. Same ledger.</h2>
+            <div className="split">
+              <article className="panel">
+                <h3>Candidates</h3>
+                <p>
+                  Build a profile, attach proof to skills, and apply with the work
+                  itself. School email can show affiliation; personal email is
+                  welcome — education stays self-reported until evidence supports it.
+                </p>
+              </article>
+              <article className="panel">
+                <h3>Employers</h3>
+                <p>
+                  Confirm a work mailbox, then add company details. Jobs stay
+                  drafts until you approve them. Higher verification unlocks
+                  more reach — a scammer gains little from a quick sign-up.
+                </p>
+              </article>
+            </div>
+          </section>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        © 2026 Zigba AI Network. Evidence over claims.
-      </footer>
+      <footer className="site-footer">© 2026 Zigba. Proof before reputation.</footer>
     </div>
   );
 }
