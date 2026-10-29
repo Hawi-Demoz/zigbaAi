@@ -1,49 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f1ede4;
-  --bg-elevated: #f8f4ec;
-  --bg-inset: #e7e1d6;
-  --ink: #1a1714;
-  --ink-muted: #5c564e;
-  --ink-faint: #8a8278;
-  --line: #d4cdc0;
-  --line-strong: #b7ae9f;
-  --accent: #b34a1f;
-  --accent-soft: #f3ddd2;
-  --accent-fg: #fff8f2;
-  --ok: #2c5a38;
-  --ok-soft: #dce8df;
-  --warn: #8a5a12;
-  --warn-soft: #f1e4cc;
-  --danger: #9b2c2c;
-  --danger-soft: #f3d8d6;
-  --focus: #1a1714;
-  --shadow: 0 1px 0 rgb(26 23 20 / 0.06);
+  --bg: #F2F4F5;
+  --bg-elevated: #FFFFFF;
+  --bg-inset: #E7EBED;
+  --ink: #0D1F23;
+  --ink-muted: #5A636A;
+  --ink-faint: #69818D;
+  --line: #D3DADD;
+  --line-strong: #D3DADD;
+  --accent: #1F6F78;
+  --accent-soft: #E7EBED;
+  --accent-fg: #FFFFFF;
+  --ok: #1E7A4D;
+  --ok-soft: #E7EBED;
+  --warn: #8A5A00;
+  --warn-soft: #E7EBED;
+  --danger: #B3261E;
+  --danger-soft: #E7EBED;
+  --focus: #1F6F78;
+  --shadow: 0 1px 0 var(--line);
   --radius: 8px;
   --header-h: 64px;
 }
 
 html.dark {
-  --bg: #141210;
-  --bg-elevated: #1c1916;
-  --bg-inset: #12100e;
-  --ink: #eee8de;
-  --ink-muted: #a49b90;
-  --ink-faint: #7a7268;
-  --line: #322c26;
-  --line-strong: #4a423a;
-  --accent: #e08a5c;
-  --accent-soft: #3a241c;
-  --accent-fg: #1a120e;
-  --ok: #9ec9a6;
-  --ok-soft: #1e2a21;
-  --warn: #d4b483;
-  --warn-soft: #2c2418;
-  --danger: #e08a8a;
-  --danger-soft: #2c1a1a;
-  --focus: #eee8de;
-  --shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+  --bg: #0D1F23;
+  --bg-elevated: #132E35;
+  --bg-inset: #1B3A43;
+  --ink: #E9EDEE;
+  --ink-muted: #AFB3B7;
+  --ink-faint: #69818D;
+  --line: #2D4A53;
+  --line-strong: #2D4A53;
+  --accent: #7FD1C7;
+  --accent-soft: #1B3A43;
+  --accent-fg: #0D1F23;
+  --ok: #6FCF97;
+  --ok-soft: #1B3A43;
+  --warn: #E8B04B;
+  --warn-soft: #1B3A43;
+  --danger: #F28B8B;
+  --danger-soft: #1B3A43;
+  --focus: #7FD1C7;
+  --shadow: 0 1px 0 var(--line);
 }
 
 @theme inline {
@@ -107,7 +107,7 @@ body {
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
 }
@@ -330,13 +330,13 @@ html:not(.dark) .theme-toggle__copy--night {
 }
 
 .btn--primary {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--ink) 88%, var(--accent));
+  background: var(--accent);
 }
 
 .btn--secondary {
@@ -408,7 +408,7 @@ html:not(.dark) .theme-toggle__copy--night {
 .field__hint {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--ink-faint);
+  color: var(--ink-muted);
 }
 
 .input {
@@ -514,7 +514,7 @@ html:not(.dark) .theme-toggle__copy--night {
 }
 
 .stamp--muted {
-  color: var(--ink-faint);
+  color: var(--ink-muted);
 }
 
 .alert {
@@ -630,7 +630,7 @@ html:not(.dark) .theme-toggle__copy--night {
   padding: 1.25rem;
   text-align: center;
   font-size: 0.78rem;
-  color: var(--ink-faint);
+  color: var(--ink-muted);
 }
 
 /* ——— Landing ——— */
@@ -868,7 +868,7 @@ html:not(.dark) .theme-toggle__copy--night {
 }
 
 .auth__foot a {
-  color: var(--ink);
+  color: var(--accent);
   font-weight: 650;
 }
 
